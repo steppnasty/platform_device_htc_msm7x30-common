@@ -65,6 +65,10 @@ PRODUCT_PACKAGES += \
     libQcomUI \
     libtilerenderer
 
+# Camera
+PRODUCT_PACKAGES += \
+    camera.spade
+
 # Media
 PRODUCT_PACKAGES += \
     libOmxCore \
