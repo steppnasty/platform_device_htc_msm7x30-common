@@ -91,6 +91,10 @@ PRODUCT_TAGS += dalvik.gc.type-precise
 # use high-density artwork where available
 PRODUCT_LOCALES += hdpi
 
+# media config xml file
+PRODUCT_COPY_FILES += \
+    device/htc/msm7x30-common/media_profiles.xml:system/etc/media_profiles.xml
+
 PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
 
