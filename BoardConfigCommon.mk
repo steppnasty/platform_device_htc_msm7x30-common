@@ -30,6 +30,8 @@ ARCH_ARM_HAVE_TLS_REGISTER := true
 TARGET_GLOBAL_CFLAGS += -mfpu=neon -mfloat-abi=softfp
 TARGET_GLOBAL_CPPFLAGS += -mfpu=neon -mfloat-abi=softfp
 
+ARCH_ARM_HAVE_VFP := true
+
 TARGET_SPECIFIC_HEADER_PATH := device/htc/msm7x30-common/include
 
 # Wifi related defines
@@ -54,7 +56,7 @@ TARGET_USES_C2D_COMPOSITION := false
 TARGET_USES_SF_BYPASS := false
 TARGET_HAVE_BYPASS := false
 TARGET_USES_OVERLAY := true
-TARGET_QCOM_HDMI_OUT := true
+TARGET_QCOM_HDMI_OUT := false
 TARGET_GRALLOC_USES_ASHMEM := false
 TARGET_USES_GENLOCK := true
 
