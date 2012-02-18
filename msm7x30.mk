@@ -67,7 +67,7 @@ PRODUCT_PACKAGES += \
 
 # Camera
 PRODUCT_PACKAGES += \
-    camera.spade
+    camera.msm7x30
 
 # Media
 PRODUCT_PACKAGES += \
