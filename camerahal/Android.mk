@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ifeq ($(TARGET_BOARD_PLATFORM),msm7x30)
+
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
@@ -21,7 +23,7 @@ LOCAL_MODULE := camera.$(TARGET_BOARD_PLATFORM)
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_SRC_FILES := camera.cpp
+LOCAL_SRC_FILES := camera.cpp overlay.cpp
 LOCAL_SHARED_LIBRARIES := liblog libutils libcutils
 LOCAL_SHARED_LIBRARIES += libui libhardware libcamera_client
 LOCAL_SHARED_LIBRARIES += libcamera
@@ -35,3 +37,5 @@ LOCAL_CFLAGS += -DBOARD_USE_REVERSE_FFC
 endif
 
 include $(BUILD_SHARED_LIBRARY)
+
+endif
