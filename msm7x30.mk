@@ -77,7 +77,11 @@ PRODUCT_PACKAGES += \
      libmm-omxcore \
      libdivxdrmdecrypt \
      libOmxVenc \
-     libOmxVdec
+     libOmxVdec \
+     mm-vdec-omx-test \
+     mm-video-driver-test \
+     mm-venc-omx-test720p \
+     mm-video-encdrv-test
 
 # Misc
 PRODUCT_PACKAGES += \
