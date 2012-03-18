@@ -37,6 +37,7 @@ TARGET_GLOBAL_CPPFLAGS += -mfpu=neon -mfloat-abi=softfp
 TARGET_EXTRA_CFLAGS += $(call cc-option,-march=armv7-a -mtune=cortex-a8)
 
 ARCH_ARM_HAVE_VFP := true
+USE_MALLOC_ALIGNMENT := 16
 
 TARGET_SPECIFIC_HEADER_PATH := device/htc/msm7x30-common/include
 
