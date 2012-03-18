@@ -387,6 +387,20 @@ static void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
 
 }
 
+#ifdef CAF_PARAMS
+static String8 create_values_str(const str_map *values, int len) {
+    String8 str;
+    
+    if (len > 0) {
+        str.append(values[0].desc);
+    }
+    for (int i = 1; i < len; i++) {
+        str.append(",");
+        str.append(values[i].desc);
+    }
+    return str;
+}
+#endif
 
 /*******************************************************************
  * implementation of priv_camera_device_ops functions
@@ -394,73 +408,25 @@ static void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
 
 void CameraHAL_FixupParams(android::CameraParameters &camParams)
 {
-    const char *preview_sizes =
-    "1280x720,800x480,768x432,720x480,640x480,576x432,480x320,384x288,352x288,320x240,240x160,176x144";
-    const char *video_sizes = 
-    "1280x720,800x480,720x480,640x480,480x320,352x288,320x240,176x144";
-    const char *prefer_video_size = "640x480";
-    const char *preview_frame_rates  = "30,27,24,15";
-    const char *prefer_frame_rate = "15";
-    const char *frame_rate_range = "15,30";
+    camParams.set(CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO, "640x480");
 #ifdef CAF_PARAMS
-    const char *max_sharpness = "30";
-    const char *max_contrast = "10";
-    const char *max_saturation = "10";
-#endif
-    
-    if (!camParams.get(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT)) {
-        camParams.set(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT,
-                      android::CameraParameters::PIXEL_FORMAT_YUV420SP);
-    }
-
-    if (!camParams.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_SIZES)) {
-        camParams.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_SIZES,
-                      preview_sizes);
-    }
-    
-    if (!camParams.get(android::CameraParameters::KEY_SUPPORTED_VIDEO_SIZES)) {
-        camParams.set(android::CameraParameters::KEY_SUPPORTED_VIDEO_SIZES,
-                      video_sizes);
-    }
-    
-    if (!camParams.get(android::CameraParameters::KEY_VIDEO_SIZE)) {
-        camParams.set(CameraParameters::KEY_VIDEO_SIZE, prefer_video_size);
-    }
-    
-    if (!camParams.get(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO)) {
-        camParams.set(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO,
-                      prefer_video_size);
-    }
-    
-    if (!camParams.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES)) {
-        camParams.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES,
-                      preview_frame_rates);
-    }
-    
-    if (!camParams.get(android::CameraParameters::KEY_PREVIEW_FRAME_RATE)) {
-        camParams.set(CameraParameters::KEY_PREVIEW_FRAME_RATE, prefer_frame_rate);
-    }
-
-    if (!camParams.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FPS_RANGE)) {
-        LOGD("Setting KEY_PREVIEW_FPS_RANGE: %s\n", frame_rate_range);
-        camParams.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FPS_RANGE,
-                     frame_rate_range);
-    }
-
-#ifdef CAF_PARAMS
-    if (!camParams.get(android::CameraParameters::KEY_MAX_SHARPNESS)) {
-        camParams.set(CameraParameters::KEY_MAX_SHARPNESS, max_sharpness);
-    }
-    
-    if (!camParams.get(android::CameraParameters::KEY_MAX_CONTRAST)) {
-        camParams.set(CameraParameters::KEY_MAX_CONTRAST, max_sharpness);
-    }
-    
-    if (!camParams.get(android::CameraParameters::KEY_MAX_SATURATION)) {
-        camParams.set(CameraParameters::KEY_MAX_SATURATION, max_sharpness);
-    }
-    
+    camParams.set(CameraParameters::KEY_MAX_SHARPNESS, "30");
+    camParams.set(CameraParameters::KEY_MAX_CONTRAST, "10");
+    camParams.set(CameraParameters::KEY_MAX_SATURATION, "10");
+    static String8 touchafaec_values;
+    static const str_map touchafaec[] = {
+        { CameraParameters::TOUCH_AF_AEC_OFF, FALSE },
+        { CameraParameters::TOUCH_AF_AEC_ON, TRUE }
+    };
+    touchafaec_values = create_values_str(touchafaec, sizeof(touchafaec)/sizeof(str_map));
+    camParams.set(CameraParameters::KEY_SUPPORTED_TOUCH_AF_AEC, touchafaec_values);
+    camParams.set("touchAfAec-dx","100");
+    camParams.set("touchAfAec-dy","100");
     camParams.set("num-snaps-per-shutter", "1");
+    camParams.set("zoom-supported", "true");
+    camParams.set("video-zoom-support", "true");
+    camParams.set("video-stabilization-supported", "true");
+    camParams.set("capture-burst-interval-supported", "false");
 #endif
 }
 
@@ -525,8 +491,14 @@ int camera_set_preview_window(struct camera_device * device,
         return -1;
     }
 
+#ifndef CAF_PARAMS
     window->set_usage(window, GRALLOC_USAGE_PMEM_PRIVATE_ADSP | GRALLOC_USAGE_SW_READ_OFTEN);
-
+#else
+#ifdef CPU_COLOR_CONVERT
+    window->set_usage(window, GRALLOC_USAGE_PMEM_PRIVATE_ADSP | GRALLOC_USAGE_SW_READ_OFTEN);
+#endif
+#endif
+    
     if (window->set_buffers_geometry(window, preview_width,
                                      preview_height, hal_pixel_format)) {
         LOGE("%s---: could not set buffers geometry to %s",
@@ -901,6 +873,9 @@ char* camera_get_parameters(struct camera_device * device)
 
 #ifdef HTC_FFC
     if (dev->cameraid == 1) {
+#ifdef OFFSET_FFC
+        camParams.set(CameraParameters::KEY_ROTATION, 0);
+#endif
 #ifdef REVERSE_FFC
         /* Change default parameters for the front camera */
         camParams.set("front-camera-mode", "reverse"); // default is "mirror"
