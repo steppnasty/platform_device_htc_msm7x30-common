@@ -81,7 +81,7 @@ BOARD_HAVE_BLUETOOTH_BCM := true
 
 BOARD_VENDOR_QCOM_AMSS_VERSION := 1200
 
-BOARD_EGL_CFG := device/htc/msm7x30-common/egl.cfg
+BOARD_EGL_CFG := vendor/qcom/proprietary/system/lib/egl/egl.cfg
 
 BOARD_USE_LEGACY_TOUCHSCREEN := true
 
