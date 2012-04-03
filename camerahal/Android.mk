@@ -37,12 +37,6 @@ endif
 ifeq ($(BOARD_USE_REVERSE_FFC), true)
     LOCAL_CFLAGS += -DREVERSE_FFC
 endif
-ifeq ($(TARGET_USE_CAF_PARAMS), true)
-    LOCAL_CFLAGS += -DCAF_PARAMS
-endif
-ifeq ($(TARGET_INVERSE_ROTATE), true)
-    LOCAL_CFLAGS += -DINVERSE_ORIENTATION
-endif
 
 include $(BUILD_SHARED_LIBRARY)
 
