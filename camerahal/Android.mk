@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ifeq ($(TARGET_BOARD_PLATFORM),msm7x30)
+ifeq ($(BOARD_USES_HTC_CAMERA),true)
 
 LOCAL_PATH:= $(call my-dir)
 
