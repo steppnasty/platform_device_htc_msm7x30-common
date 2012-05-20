@@ -30,7 +30,6 @@ PRODUCT_COPY_FILES += \
     packages/wallpapers/LivePicker/android.software.live_wallpaper.xml:system/etc/permissions/android.software.live_wallpaper.xml
 
 PRODUCT_COPY_FILES += \
-    device/htc/msm7x30-common/init.rc:root/init.rc \
     device/htc/msm7x30-common/init.htc7x30.usb.rc:root/init.htc7x30.usb.rc
 
 # Common 7x30 firmware
@@ -76,10 +75,6 @@ PRODUCT_PACKAGES += \
      libdivxdrmdecrypt \
      libOmxVenc \
      libOmxVdec \
-     mm-vdec-omx-test \
-     mm-video-driver-test \
-     mm-venc-omx-test720p \
-     mm-video-encdrv-test \
      libI420colorconvert
 
 # Misc
