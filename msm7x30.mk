@@ -90,7 +90,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_TAGS += dalvik.gc.type-precise
 
 # use high-density artwork where available
-PRODUCT_LOCALES += hdpi
+PRODUCT_LOCALES += en
 
 # media config xml file
 PRODUCT_COPY_FILES += \
