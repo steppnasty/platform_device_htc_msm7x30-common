@@ -25,6 +25,8 @@ TARGET_BOARD_PLATFORM_GPU := qcom-adreno200
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
 TARGET_ARCH_VARIANT := armv7-a-neon
+TARGET_ARCH_VARIANT_CPU := cortex-a8
+TARGET_ARCH_VARIANT_FPU := neon
 ARCH_ARM_HAVE_TLS_REGISTER := true
 
 TARGET_USE_SCORPION_BIONIC_OPTIMIZATION := true
@@ -35,9 +37,8 @@ TARGET_SCORPION_BIONIC_PLDSIZE := 128
 TARGET_GLOBAL_CFLAGS += -mfpu=neon -mfloat-abi=softfp
 TARGET_GLOBAL_CPPFLAGS += -mfpu=neon -mfloat-abi=softfp
 
-TARGET_EXTRA_CFLAGS += $(call cc-option,-mtune=cortex-a8) $(call cc-option,-mcpu=cortex-a8)
+TARGET_EXTRA_CFLAGS += $(call cc-option,-mtune=cortex-a8) $(call cc-option,-march=armv7-a)
 
-ARCH_ARM_HAVE_VFP := true
 BOARD_MALLOC_ALIGNMENT := 16
 
 TARGET_SPECIFIC_HEADER_PATH := device/htc/msm7x30-common/include
