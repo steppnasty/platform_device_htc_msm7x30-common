@@ -18,6 +18,7 @@
  */
 
 #define LOG_TAG "CameraHAL"
+#define LOG_NDEBUG 1      /* disable LOGV */
 
 #define MAX_CAMERAS_SUPPORTED 2
 #define GRALLOC_USAGE_PMEM_PRIVATE_ADSP GRALLOC_USAGE_PRIVATE_0
@@ -121,7 +122,7 @@ static void dump_msg(const char *tag, int msg_type)
     int i;
     for (i = 0; msg_map[i].type; i++) {
         if (msg_type & msg_map[i].type) {
-            LOGI("%s: %s", tag, msg_map[i].text);
+            LOGV("%s: %s", tag, msg_map[i].text);
         }
     }
 }
@@ -147,13 +148,13 @@ static void wrap_set_crop_hook(void *data,
                                uint32_t w, uint32_t h)
 {
     priv_camera_device_t* dev = NULL;
-    LOGI("%s+++: %p", __FUNCTION__,data);
+    LOGV("%s+++: %p", __FUNCTION__,data);
 
     if(!data)
         return;
 
     dev = (priv_camera_device_t*) data;
-    LOGI("%s---: %i %i %i %i", __FUNCTION__, x, y, w, h);
+    LOGV("%s---: %i %i %i %i", __FUNCTION__, x, y, w, h);
 }
 //QiSS ME for preview
 static void wrap_queue_buffer_hook(void *data, void* buffer)
@@ -221,7 +222,7 @@ skipframe:
         char path[128];
         snprintf(path, sizeof(path), "/data/%d_preview.yuv", frameCnt);
         int file_fd = open(path, O_RDWR | O_CREAT, 0666);
-        LOGI("dumping preview frame %d", frameCnt);
+        LOGV("dumping preview frame %d", frameCnt);
         if (file_fd < 0) {
             LOGE("cannot open file:%s (error:%i)\n", path, file_fd);
         }
@@ -237,7 +238,7 @@ skipframe:
     }
     frameCnt++;
 #endif
-    LOGI("%s---: ", __FUNCTION__);
+    LOGV("%s---: ", __FUNCTION__);
 
     return;
 }
@@ -255,7 +256,7 @@ static camera_memory_t *wrap_memory_data(priv_camera_device_t *dev,
     sp<IMemoryHeap> heap;
     camera_memory_t *mem;
 
-    LOGI("%s+++,dev->request_memory %p", __FUNCTION__,dev->request_memory);
+    LOGV("%s+++,dev->request_memory %p", __FUNCTION__,dev->request_memory);
 
     if (!dev->request_memory)
         return NULL;
@@ -263,9 +264,9 @@ static camera_memory_t *wrap_memory_data(priv_camera_device_t *dev,
     heap = dataPtr->getMemory(&offset, &size);
     data = (void *)((char *)(heap->base()) + offset);
 
-    LOGI("%s: data: %p size: %i", __FUNCTION__, data, size);
+    LOGV("%s: data: %p size: %i", __FUNCTION__, data, size);
 
-    LOGI(" offset:0x%x ",  offset);
+    LOGV(" offset:0x%x ",  offset);
 
     //#define DUMP_CAPTURE_JPEG
 #ifdef DUMP_CAPTURE_JPEG
@@ -274,7 +275,7 @@ static camera_memory_t *wrap_memory_data(priv_camera_device_t *dev,
     char path[128];
     snprintf(path, sizeof(path), "/data/%d_capture.jpg", frameCnt);
     int file_fd = open(path, O_RDWR | O_CREAT, 0666);
-    LOGI("dumping capture jpeg %d", frameCnt);
+    LOGV("dumping capture jpeg %d", frameCnt);
     if (file_fd < 0) {
         LOGE("cannot open file:%s (error:%i)\n", path, file_fd);
     }
@@ -292,10 +293,10 @@ static camera_memory_t *wrap_memory_data(priv_camera_device_t *dev,
 
     mem = dev->request_memory(-1, size, 1, dev->user);
 
-    LOGI(" mem:%p,mem->data%p ",  mem,mem->data);
+    LOGV(" mem:%p,mem->data%p ",  mem,mem->data);
 
     memcpy(mem->data, data, size);
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
 
     return mem;
 }
@@ -305,7 +306,7 @@ static void wrap_notify_callback(int32_t msg_type, int32_t ext1,
 {
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: type %i user %p", __FUNCTION__, msg_type,user);
+    LOGV("%s+++: type %i user %p", __FUNCTION__, msg_type,user);
     dump_msg(__FUNCTION__, msg_type);
 
     if(!user)
@@ -315,7 +316,7 @@ static void wrap_notify_callback(int32_t msg_type, int32_t ext1,
 
     if (dev->notify_callback)
         dev->notify_callback(msg_type, ext1, ext2, dev->user);
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
 
 }
 //QiSS ME for capture
@@ -325,7 +326,7 @@ static void wrap_data_callback(int32_t msg_type, const sp<IMemory>& dataPtr,
     camera_memory_t *data = NULL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: type %i user %p", __FUNCTION__, msg_type,user);
+    LOGV("%s+++: type %i user %p", __FUNCTION__, msg_type,user);
     dump_msg(__FUNCTION__, msg_type);
 
     if(!user)
@@ -343,7 +344,7 @@ static void wrap_data_callback(int32_t msg_type, const sp<IMemory>& dataPtr,
 
     if (dev->data_callback)
         dev->data_callback(msg_type, data, 0, NULL, dev->user);
-	LOGI("%s---", __FUNCTION__);
+	LOGV("%s---", __FUNCTION__);
 
 }
 //QiSS ME for record
@@ -354,7 +355,7 @@ static void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
     priv_camera_device_t* dev = NULL;
     camera_memory_t *data = NULL;
 
-    LOGI("%s+++: type %i user %p", __FUNCTION__, msg_type,user);
+    LOGV("%s+++: type %i user %p", __FUNCTION__, msg_type,user);
     dump_msg(__FUNCTION__, msg_type);
 
     if(!user)
@@ -373,7 +374,7 @@ static void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
         data->release(data);
     }
 
-	LOGI("%s---", __FUNCTION__);
+	LOGV("%s---", __FUNCTION__);
 
 }
 
@@ -416,7 +417,7 @@ int camera_set_preview_window(struct camera_device * device,
     int kBufferCount = 4;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++,device %p", __FUNCTION__,device);
+    LOGV("%s+++,device %p", __FUNCTION__,device);
 
     if(!device)
         return rv;
@@ -426,7 +427,7 @@ int camera_set_preview_window(struct camera_device * device,
     dev->window = window;
 
     if (!window) {
-        LOGI("%s---: window is NULL", __FUNCTION__);
+        LOGV("%s---: window is NULL", __FUNCTION__);
         return 0;
     }
 
@@ -442,14 +443,14 @@ int camera_set_preview_window(struct camera_device * device,
         return -1;
     }
 
-    LOGI("%s: bufs:%i", __FUNCTION__, min_bufs);
+    LOGV("%s: bufs:%i", __FUNCTION__, min_bufs);
 
     if (min_bufs >= kBufferCount) {
         LOGE("%s: min undequeued buffer count %i is too high (expecting at most %i)",
              __FUNCTION__, min_bufs, kBufferCount - 1);
     }
 
-    LOGI("%s: setting buffer count to %i", __FUNCTION__, kBufferCount);
+    LOGV("%s: setting buffer count to %i", __FUNCTION__, kBufferCount);
     if (window->set_buffer_count(window, kBufferCount)) {
         LOGE("%s---: could not set buffer count", __FUNCTION__);
         return -1;
@@ -462,7 +463,7 @@ int camera_set_preview_window(struct camera_device * device,
     int hal_pixel_format = HAL_PIXEL_FORMAT_YCrCb_420_SP;
 
     const char *str_preview_format = params.getPreviewFormat();
-    LOGI("%s: preview format %s", __FUNCTION__, str_preview_format);
+    LOGV("%s: preview format %s", __FUNCTION__, str_preview_format);
 
     //Enable panorama without camera application "hacks"
     //if (window->set_usage(window, GRALLOC_USAGE_SW_WRITE_MASK)) {
@@ -487,7 +488,7 @@ int camera_set_preview_window(struct camera_device * device,
                                 wrap_queue_buffer_hook,
                                 (void *)dev);
     gCameraHals[dev->cameraid]->setOverlay(dev->overlay);
-    LOGI("%s---,rv %d", __FUNCTION__,rv);
+    LOGV("%s---,rv %d", __FUNCTION__,rv);
 
     return rv;
 }
@@ -501,7 +502,7 @@ void camera_set_callbacks(struct camera_device * device,
 {
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++,device %p", __FUNCTION__,device);
+    LOGV("%s+++,device %p", __FUNCTION__,device);
 
     if(!device)
         return;
@@ -517,7 +518,7 @@ void camera_set_callbacks(struct camera_device * device,
     gCameraHals[dev->cameraid]->setCallbacks(wrap_notify_callback, wrap_data_callback,
                                              wrap_data_callback_timestamp, (void *)dev);
 
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
 
 }
 
@@ -525,7 +526,7 @@ void camera_enable_msg_type(struct camera_device * device, int32_t msg_type)
 {
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: type %i device %p", __FUNCTION__, msg_type,device);
+    LOGV("%s+++: type %i device %p", __FUNCTION__, msg_type,device);
     if (msg_type & CAMERA_MSG_RAW_IMAGE_NOTIFY) {
         msg_type &= ~CAMERA_MSG_RAW_IMAGE_NOTIFY;
         msg_type |= CAMERA_MSG_RAW_IMAGE;
@@ -539,7 +540,7 @@ void camera_enable_msg_type(struct camera_device * device, int32_t msg_type)
     dev = (priv_camera_device_t*) device;
 
     gCameraHals[dev->cameraid]->enableMsgType(msg_type);
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
 
 }
 
@@ -547,7 +548,7 @@ void camera_disable_msg_type(struct camera_device * device, int32_t msg_type)
 {
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: type %i device %p", __FUNCTION__, msg_type,device);
+    LOGV("%s+++: type %i device %p", __FUNCTION__, msg_type,device);
     dump_msg(__FUNCTION__, msg_type);
 
     if(!device)
@@ -556,7 +557,7 @@ void camera_disable_msg_type(struct camera_device * device, int32_t msg_type)
     dev = (priv_camera_device_t*) device;
 
     gCameraHals[dev->cameraid]->disableMsgType(msg_type);
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
 
 }
 
@@ -565,7 +566,7 @@ int camera_msg_type_enabled(struct camera_device * device, int32_t msg_type)
     priv_camera_device_t* dev = NULL;
     int rv = -EINVAL;
 
-    LOGI("%s+++: type %i device %p", __FUNCTION__, msg_type,device);
+    LOGV("%s+++: type %i device %p", __FUNCTION__, msg_type,device);
 
     if(!device)
         return 0;
@@ -573,7 +574,7 @@ int camera_msg_type_enabled(struct camera_device * device, int32_t msg_type)
     dev = (priv_camera_device_t*) device;
 
     rv = gCameraHals[dev->cameraid]->msgTypeEnabled(msg_type);
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
     return rv;
 }
 
@@ -582,7 +583,7 @@ int camera_start_preview(struct camera_device * device)
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return rv;
@@ -590,7 +591,7 @@ int camera_start_preview(struct camera_device * device)
     dev = (priv_camera_device_t*) device;
 
     rv = gCameraHals[dev->cameraid]->startPreview();
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
 
     return rv;
 }
@@ -599,7 +600,7 @@ void camera_stop_preview(struct camera_device * device)
 {
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return;
@@ -607,7 +608,7 @@ void camera_stop_preview(struct camera_device * device)
     dev = (priv_camera_device_t*) device;
 
     gCameraHals[dev->cameraid]->stopPreview();
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
 }
 
 int camera_preview_enabled(struct camera_device * device)
@@ -615,7 +616,7 @@ int camera_preview_enabled(struct camera_device * device)
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return rv;
@@ -624,7 +625,7 @@ int camera_preview_enabled(struct camera_device * device)
 
     rv = gCameraHals[dev->cameraid]->previewEnabled();
 
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
 
     return rv;
 }
@@ -634,7 +635,7 @@ int camera_store_meta_data_in_buffers(struct camera_device * device, int enable)
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return rv;
@@ -643,7 +644,7 @@ int camera_store_meta_data_in_buffers(struct camera_device * device, int enable)
 
     //  TODO: meta data buffer not current supported
     //rv = gCameraHals[dev->cameraid]->storeMetaDataInBuffers(enable);
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
     return rv;
     //return enable ? android::INVALID_OPERATION: android::OK;
 }
@@ -653,7 +654,7 @@ int camera_start_recording(struct camera_device * device)
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return rv;
@@ -661,7 +662,7 @@ int camera_start_recording(struct camera_device * device)
     dev = (priv_camera_device_t*) device;
 
     rv = gCameraHals[dev->cameraid]->startRecording();
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
 
     return rv;
 }
@@ -670,7 +671,7 @@ void camera_stop_recording(struct camera_device * device)
 {
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return;
@@ -681,7 +682,7 @@ void camera_stop_recording(struct camera_device * device)
 
     //QiSS ME force start preview when recording stop
     gCameraHals[dev->cameraid]->startPreview();
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
 }
 
 int camera_recording_enabled(struct camera_device * device)
@@ -689,7 +690,7 @@ int camera_recording_enabled(struct camera_device * device)
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return rv;
@@ -697,7 +698,7 @@ int camera_recording_enabled(struct camera_device * device)
     dev = (priv_camera_device_t*) device;
 
     rv = gCameraHals[dev->cameraid]->recordingEnabled();
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
     return rv;
 }
 
@@ -721,7 +722,7 @@ void camera_release_recording_frame(struct camera_device * device,
      */
     //gCameraHals[dev->cameraid]->releaseRecordingFrame(opaque);
 
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
 }
 
 int camera_auto_focus(struct camera_device * device)
@@ -729,7 +730,7 @@ int camera_auto_focus(struct camera_device * device)
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return rv;
@@ -738,7 +739,7 @@ int camera_auto_focus(struct camera_device * device)
 
     rv = gCameraHals[dev->cameraid]->autoFocus();
 
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
     return rv;
 }
 
@@ -747,7 +748,7 @@ int camera_cancel_auto_focus(struct camera_device * device)
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return rv;
@@ -755,7 +756,7 @@ int camera_cancel_auto_focus(struct camera_device * device)
     dev = (priv_camera_device_t*) device;
 
     rv = gCameraHals[dev->cameraid]->cancelAutoFocus();
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
     return rv;
 }
 
@@ -764,7 +765,7 @@ int camera_take_picture(struct camera_device * device)
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return rv;
@@ -773,7 +774,7 @@ int camera_take_picture(struct camera_device * device)
 
     rv = gCameraHals[dev->cameraid]->takePicture();
 
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
     return rv;
 }
 
@@ -782,7 +783,7 @@ int camera_cancel_picture(struct camera_device * device)
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return rv;
@@ -791,7 +792,7 @@ int camera_cancel_picture(struct camera_device * device)
 
     rv = gCameraHals[dev->cameraid]->cancelPicture();
 
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
     return rv;
 }
 
@@ -801,7 +802,7 @@ int camera_set_parameters(struct camera_device * device, const char *params)
     priv_camera_device_t* dev = NULL;
     CameraParameters camParams;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return rv;
@@ -819,7 +820,7 @@ int camera_set_parameters(struct camera_device * device, const char *params)
 #if 0
     camParams.dump();
 #endif
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
     return rv;
 }
 
@@ -830,7 +831,7 @@ char* camera_get_parameters(struct camera_device * device)
     String8 params_str8;
     CameraParameters camParams;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return NULL;
@@ -863,15 +864,15 @@ char* camera_get_parameters(struct camera_device * device)
 #if 0
     camParams.dump();
 #endif
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
     return params;
 }
 
 static void camera_put_parameters(struct camera_device *device, char *parms)
 {
-    LOGI("%s+++", __FUNCTION__);
+    LOGV("%s+++", __FUNCTION__);
     free(parms);
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
 }
 
 int camera_send_command(struct camera_device * device,
@@ -880,7 +881,7 @@ int camera_send_command(struct camera_device * device,
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s: cmd %i,device %p", __FUNCTION__, cmd,device);
+    LOGV("%s: cmd %i,device %p", __FUNCTION__, cmd,device);
 
     if(!device)
         return rv;
@@ -888,7 +889,7 @@ int camera_send_command(struct camera_device * device,
     dev = (priv_camera_device_t*) device;
 
     rv = gCameraHals[dev->cameraid]->sendCommand(cmd, arg1, arg2);
-    LOGI("%s--- rv %d", __FUNCTION__,rv);
+    LOGV("%s--- rv %d", __FUNCTION__,rv);
     return rv;
 }
 
@@ -896,7 +897,7 @@ void camera_release(struct camera_device * device)
 {
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     if(!device)
         return;
@@ -904,14 +905,14 @@ void camera_release(struct camera_device * device)
     dev = (priv_camera_device_t*) device;
 
     gCameraHals[dev->cameraid]->release();
-    LOGI("%s---", __FUNCTION__);
+    LOGV("%s---", __FUNCTION__);
 }
 
 int camera_dump(struct camera_device * device, int fd)
 {
     int rv = -EINVAL;
     priv_camera_device_t* dev = NULL;
-    LOGI("%s", __FUNCTION__);
+    LOGV("%s", __FUNCTION__);
 
     if(!device)
         return rv;
@@ -930,7 +931,7 @@ int camera_device_close(hw_device_t* device)
     int ret = 0;
     priv_camera_device_t* dev = NULL;
 
-    LOGI("%s+++: device %p", __FUNCTION__, device);
+    LOGV("%s+++: device %p", __FUNCTION__, device);
 
     //android::Mutex::Autolock lock(gCameraDeviceLock);
 
@@ -954,7 +955,7 @@ done:
 #ifdef HEAPTRACKER
     heaptracker_free_leaked_memory();
 #endif
-    LOGI("%s--- ret %d", __FUNCTION__,ret);
+    LOGV("%s--- ret %d", __FUNCTION__,ret);
 
     return ret;
 }
@@ -982,7 +983,7 @@ int camera_device_open(const hw_module_t* module, const char* name,
     //android::Mutex::Autolock lock(gCameraDeviceLock);
 
 
-    LOGI("camera_device open+++");
+    LOGV("camera_device open+++");
 
     if (name != NULL) {
         cameraid = atoi(name);
@@ -1028,7 +1029,7 @@ int camera_device_open(const hw_module_t* module, const char* name,
         int htc_fd;
 
         if (access(HTC_SWITCH_CAMERA_FILE_PATH, W_OK) == 0) {
-            LOGI("Switching to HTC Camera: %d", cameraid);
+            LOGV("Switching to HTC Camera: %d", cameraid);
             snprintf(htc_buffer, sizeof(htc_buffer), "%d", cameraid);
             htc_fd = open(HTC_SWITCH_CAMERA_FILE_PATH, O_WRONLY);
             write(htc_fd, htc_buffer, strlen(htc_buffer));
@@ -1087,7 +1088,7 @@ int camera_device_open(const hw_module_t* module, const char* name,
         gCameraHals[cameraid] = camera;
         gCamerasOpen++;
     }
-    LOGI("%s---ok rv %d", __FUNCTION__,rv);
+    LOGV("%s---ok rv %d", __FUNCTION__,rv);
 
     return rv;
 
@@ -1101,7 +1102,7 @@ fail:
         camera_ops = NULL;
     }
     *device = NULL;
-    LOGI("%s--- fail rv %d", __FUNCTION__,rv);
+    LOGV("%s--- fail rv %d", __FUNCTION__,rv);
 
     return rv;
 }
@@ -1110,7 +1111,7 @@ int camera_get_number_of_cameras(void)
 {
     int num_cameras = HAL_getNumberOfCameras();
 
-    LOGI("%s: number:%i", __FUNCTION__, num_cameras);
+    LOGV("%s: number:%i", __FUNCTION__, num_cameras);
 
     return num_cameras;
 }
@@ -1131,7 +1132,7 @@ int camera_get_camera_info(int camera_id, struct camera_info *info)
         info->orientation = 90;
     }
 
-    LOGI("%s: id:%i faceing:%i orientation: %i", __FUNCTION__,camera_id, info->facing, info->orientation);
+    LOGV("%s: id:%i faceing:%i orientation: %i", __FUNCTION__,camera_id, info->facing, info->orientation);
 
     return rv;
 }
