@@ -64,8 +64,8 @@ PRODUCT_PACKAGES += \
     libtilerenderer
 
 # Camera
-PRODUCT_PACKAGES += \
-    camera.msm7x30
+# PRODUCT_PACKAGES += \
+#    camera.msm7x30
 
 # Media
 PRODUCT_PACKAGES += \
