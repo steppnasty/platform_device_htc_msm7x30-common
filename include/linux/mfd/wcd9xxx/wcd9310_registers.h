@@ -1,0 +1,4 @@
+#ifndef TABLA_CODEC_DIGITAL_H
+#define TABLA_CODEC_DIGITAL_H
+
+#endif

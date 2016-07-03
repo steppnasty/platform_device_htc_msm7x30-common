@@ -1,0 +1,4 @@
+#ifndef __LINUX_MFD_MSM_ADIE_CODEC_H
+#define __LINUX_MFD_MSM_ADIE_CODEC_H
+
+#endif
