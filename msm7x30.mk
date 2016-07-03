@@ -66,8 +66,7 @@ PRODUCT_PACKAGES += \
 # Camera
 PRODUCT_PACKAGES += \
      camera.msm7x30 \
-     libmmcamera_interface \
-     mm_daemon
+     libmmcamera_interface
 
 # Media
 PRODUCT_PACKAGES += \
